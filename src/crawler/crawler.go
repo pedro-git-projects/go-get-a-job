@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 
 	"gitub.com/pedro-git-projects/go-get-a-job/src/parser"
@@ -36,9 +37,11 @@ func mkreq(url string) {
 		fmt.Fprintf(os.Stderr, err.Error())
 	}
 
-	parser.ProcessElements(doc, "h1", func(n *html.Node) {
+	parser.ProcessElements(doc, "h3", func(n *html.Node) {
 		text := parser.GetText(n)
-		fmt.Printf("Heading: %s\n", text)
+		if strings.Contains(strings.ToLower(text), "go") || strings.Contains(strings.ToLower(text), "golang") {
+			fmt.Println("Job Title:", text)
+		}
 	})
 }
 
