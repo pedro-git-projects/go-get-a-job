@@ -16,17 +16,33 @@ type NodeProcessor func(*html.Node)
 //
 // The callback function (callback) takes an *html.Node as a parameter and is responsible
 // for processing the matching elements according to specific requirements.
+//
+// The traversal is performed using a stack-based iteration to avoid potential stack overflows
+// when processing large HTML trees. The function creates a stack and pushes the root node onto it.
+// It then repeatedly pops a node from the stack, checks if it matches the selector,
+// and invokes the callback function if it does. The function also pushes all the node's children
+// onto the stack for further traversal.
+//
+// Note that the callback function should handle the processing of individual elements according
+// to specific requirements, while this function focuses on traversing and filtering the HTML node tree.
 func ProcessElements(n *html.Node, selector string, callback NodeProcessor) {
-	processNode := *new(NodeProcessor)
-	processNode = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == selector {
-			callback(n)
+	stack := &nodeStack{}
+	stack.push(n)
+
+	for {
+		node := stack.pop()
+		if node == nil {
+			break
 		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			processNode(c)
+
+		if node.Type == html.ElementNode && node.Data == selector {
+			callback(node)
+		}
+
+		for c := node.FirstChild; c != nil; c = c.NextSibling {
+			stack.push(c)
 		}
 	}
-	processNode(n)
 }
 
 // GetText extracts the text content from the given HTML node (n) and returns it.
