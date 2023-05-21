@@ -2,6 +2,7 @@ SRC_DIR := src
 BIN_DIR := bin
 LDFLAGS := -w -s 
 OBJ_NAME := crawl
+PORT := 8080
 
 build:
 	cd $(SRC_DIR); go build -v -ldflags "$(LDFLAGS)" -o $(OBJ_NAME);
@@ -12,3 +13,7 @@ run:
 
 clean:
 	rm $(BIN_DIR)/$(OBJ_NAME)
+
+godoc: 
+	godoc -http=:$(PORT)
+
